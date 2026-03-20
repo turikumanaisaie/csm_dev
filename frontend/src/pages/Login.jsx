@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
@@ -79,6 +80,9 @@ export default function Login() {
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
+            <Link to="/register" className="font-medium text-sky-600 hover:text-sky-500">
+              have?
+            </Link>
           </div>
         </form>
       </div>

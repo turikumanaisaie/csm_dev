@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 import api from '../services/api';
 
 const AuthContext = createContext();
@@ -12,10 +13,12 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      // Optionally fetch admin profile
-      api.get('/auth/me')
+      api.get('/admin/me')
         .then(res => setAdmin(res.data))
-        .catch(() => localStorage.removeItem('token'))
+        .catch(() => {
+          localStorage.removeItem('token');
+          setAdmin(null);
+        })
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
@@ -29,13 +32,26 @@ export const AuthProvider = ({ children }) => {
     return res.data;
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setAdmin(null);
+  const logout = async () => {
+    try {
+      await api.post('/admin/logout');
+    } catch (error) {
+      console.error('Logout error', error);
+    } finally {
+      localStorage.removeItem('token');
+      setAdmin(null);
+    }
+  };
+
+  const value = {
+    admin,
+    loading,
+    login,
+    logout
   };
 
   return (
-    <AuthContext.Provider value={{ admin, loading, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
